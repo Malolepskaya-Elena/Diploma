@@ -24,7 +24,7 @@ public class TestPayDebitCard {
 
     @BeforeEach
     public void openPage() {
-        open("http://localhost:8080/");
+        open("http://185.119.57.164:8080/");
         debitPaymentPage = DebitPaymentPage.getDebitPaymentPage();
     }
 
