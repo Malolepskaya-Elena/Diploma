@@ -1,9 +1,10 @@
 package ru.netology.page;
 
+import com.codeborne.selenide.Condition;
+
 public class CreditPaymentPage extends AbstractPaymentPage {
 
-    public static CreditPaymentPage getCreditPaymentPage() {
-        MainPage mainPage = new MainPage();
-        return mainPage.pressPayCreditCardButton();
+    public CreditPaymentPage() {
+        formHeader.should(Condition.visible, Condition.text("Кредит по данным карты"));
     }
 }

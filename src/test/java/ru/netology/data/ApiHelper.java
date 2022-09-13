@@ -5,17 +5,15 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import ru.netology.data.DataHelper.CardInfo;
 
 import static io.restassured.RestAssured.given;
 
-
 public class ApiHelper {
     private static final Gson gson = new Gson();
-    private static DataHelper.CardInfo cardInfo;
+    //private static CardInfo cardInfo;
     private static final RequestSpecification requestSpec = new RequestSpecBuilder()
             .setBaseUri("http://localhost")
-            .setPort(9999)
+            .setPort(8080)  //коннект к сервису, а не симулятору
             .setAccept(ContentType.JSON)
             .setContentType(ContentType.JSON)
             .log(LogDetail.ALL)
@@ -32,5 +30,4 @@ public class ApiHelper {
                 .then()
                 .statusCode(200);
     }
-
 }

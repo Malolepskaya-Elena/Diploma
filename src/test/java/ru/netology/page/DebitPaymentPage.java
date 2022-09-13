@@ -1,9 +1,10 @@
 package ru.netology.page;
 
+import com.codeborne.selenide.Condition;
+
 public class DebitPaymentPage extends AbstractPaymentPage {
 
-    public static DebitPaymentPage getDebitPaymentPage() {
-        MainPage mainPage = new MainPage();
-        return mainPage.pressPayDebitCardButton();
+    public DebitPaymentPage() {
+        formHeader.should(Condition.visible, Condition.text("Оплата по карте"));
     }
 }

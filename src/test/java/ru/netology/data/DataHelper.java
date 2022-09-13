@@ -1,7 +1,6 @@
 package ru.netology.data;
 
 import com.github.javafaker.Faker;
-import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -94,14 +93,8 @@ public class DataHelper {
         return "@#$%^&*()~-+/*?><|";
     }
 
-    @Value
-    public static class CardInfo {
-        String number;
-        String month;
-        String year;
-        String holder;   //резерв, надо
-        String cvc;
-    }
+
+
     //прописываем сценарии тестов
     public static CardInfo getApprovedCard() {           //все валидно 41
         return new CardInfo(approvedCard, getValidMonth(), getValidYear(), getOwner(), getCVC());
@@ -184,7 +177,7 @@ public class DataHelper {
         return new CardInfo(approvedCard, getValidMonth(), getValidYear(), getOwner(), getTwoNumber());
     }
 
-    public  static CardInfo getRusName() {                         //кирил
+    public  static CardInfo getRusName() {                         //рус
         return new CardInfo(approvedCard, getValidMonth(), getValidYear(), getNameRus(), getCVC());
     }
 }

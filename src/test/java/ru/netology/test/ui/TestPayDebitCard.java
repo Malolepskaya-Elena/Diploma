@@ -2,11 +2,11 @@ package ru.netology.test.ui;
 
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.selenide.AllureSelenide;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import ru.netology.data.DataHelper;
 import ru.netology.data.SQLHelper;
 import ru.netology.page.DebitPaymentPage;
+import ru.netology.page.MainPage;
 
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,13 +24,14 @@ public class TestPayDebitCard {
 
     @BeforeEach
     public void openPage() {
-        open("http://185.119.57.164:8080/");
-        debitPaymentPage = DebitPaymentPage.getDebitPaymentPage();
+        SQLHelper.databaseCleanUp();
+        open("http://localhost:8080/");
+        MainPage mp = new MainPage();
+        debitPaymentPage = mp.pressPayDebitCardButton();
     }
 
     @AfterEach
     void cleanDB() {
-        SQLHelper.databaseCleanUp();
     }
 
     @AfterAll
@@ -39,7 +40,6 @@ public class TestPayDebitCard {
     }
 
     @Test
-    @SneakyThrows
     @DisplayName("Покупка валидной картой") //на 45тыс отоварились, но образовалось 4500000
     public void shouldPayDebitValidCard() {
         var info = getApprovedCard();
@@ -49,7 +49,7 @@ public class TestPayDebitCard {
         var paymentInfo = SQLHelper.getPaymentInfo();
         var orderInfo = SQLHelper.getOrderInfo();
         var expectedAmount = "45000";
-        assertEquals(expected, getPaymentInfo().getStatus());
+        assertEquals(expected, paymentInfo.getStatus());
         assertEquals(paymentInfo.getTransaction_id(), orderInfo.getPayment_id());
         assertEquals(expectedAmount, String.valueOf(paymentInfo.getAmount()));
         //SELECT * FROM payment_entity ORDER BY created DESC
@@ -57,7 +57,6 @@ public class TestPayDebitCard {
     }
 
     @Test
-    @SneakyThrows
     @DisplayName("Покупка невалидной картой")
     void shouldPayDebitDeclinedCard() {
         var info = DataHelper.getDeclinedCard();
@@ -78,8 +77,7 @@ public class TestPayDebitCard {
     void shouldEmptyFieldCardFormDebit() {
         var info = DataHelper.getEmptyCardNumber();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCardNumberError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCardNumberError(wrongFormatMsg);
     }
 
     @Test
@@ -87,8 +85,7 @@ public class TestPayDebitCard {
     public void shouldOneNumberInFieldCardFormDebit() {
         var info = DataHelper.getOneNumberCardNumber();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCardNumberError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCardNumberError(wrongFormatMsg);
     }
 
     @Test
@@ -96,8 +93,7 @@ public class TestPayDebitCard {
     public void shouldFifteenNumberInFieldCardNumberFormDebit() {
         var info = DataHelper.getFifteenNumberCardNumber();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCardNumberError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCardNumberError(wrongFormatMsg);
     }
 
     @Test
@@ -105,8 +101,7 @@ public class TestPayDebitCard {
     public void shouldFakerCardNumberFormDebit() {
         var info = DataHelper.getFakerNumberCardNumber();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFakerCardNumber();
-        assertEquals(declinedMsg, message);
+        debitPaymentPage.sendingValidDataWithFakerCardNumber(declinedMsg);
     }
 
     @Test
@@ -114,8 +109,7 @@ public class TestPayDebitCard {
     public void shouldEmptyFieldMonthFormDebit() {
         var info = getEmptyMonth();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldMonthError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldMonthError(wrongFormatMsg);
     }
 
     @Test
@@ -123,8 +117,7 @@ public class TestPayDebitCard {
     public void shouldOneNumberInFieldMonthFormDebit() {
         var info = getOneNumberMonth();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldMonthError();
-        assertEquals(invalidData, message);
+        debitPaymentPage.sendingValidDataWithFieldMonthError(invalidData);
     }
 
     @Test
@@ -132,8 +125,7 @@ public class TestPayDebitCard {
     public void shouldFieldWithPreviousMonthFormDebit() {
         var info = getPreviousMonthInField();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldMonthError();
-        assertEquals(expiredDate, message);
+        debitPaymentPage.sendingValidDataWithFieldMonthError(expiredDate);
     }
 
     @Test
@@ -142,8 +134,7 @@ public class TestPayDebitCard {
     public void shouldFieldWithZeroMonthFormDebit() {
         var info = getZeroMonthInField();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldMonthError();
-        assertEquals(invalidData, message);
+        debitPaymentPage.sendingValidDataWithFieldMonthError(invalidData);
     }
 
     @Test
@@ -152,8 +143,7 @@ public class TestPayDebitCard {
     public void shouldFieldWithThirteenMonthFormDebit() {
         var info = getThirteenMonthInField();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldMonthError();
-        assertEquals(invalidData, message);
+        debitPaymentPage.sendingValidDataWithFieldMonthError(invalidData);
     }
 
     @Test
@@ -161,8 +151,7 @@ public class TestPayDebitCard {
     public void shouldEmptyFieldYearFormDebit() {
         var info = getEmptyYear();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldYearError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldYearError(wrongFormatMsg);
     }
 
     @Test
@@ -171,8 +160,7 @@ public class TestPayDebitCard {
     public void shouldPreviousYearFieldYearFormDebit() {
         var info = getPreviousYearInField();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldYearError();
-        assertEquals(expiredDate, message);
+        debitPaymentPage.sendingValidDataWithFieldYearError(expiredDate);
     }
 
     @Test
@@ -181,8 +169,7 @@ public class TestPayDebitCard {
     public void shouldPlusSixYearFieldYearFormDebit() {
         var info = getPlusSixYearInField();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldYearError();
-        assertEquals(invalidData, message);
+        debitPaymentPage.sendingValidDataWithFieldYearError(invalidData);
     }
 
     @Test
@@ -190,8 +177,7 @@ public class TestPayDebitCard {
     public void shouldEmptyFieldNameFormDebit() {
         var info = getApprovedCard();
         debitPaymentPage.sendingEmptyNameValidData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldNameError();
-        assertEquals(mustBeFilledMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldNameError(mustBeFilledMsg);
     }
 
     @Test
@@ -200,8 +186,7 @@ public class TestPayDebitCard {
     public void shouldSpecialSymbolInFieldNameFormDebit() {
         var info = getSpecialSymbolInFieldName();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldNameError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldNameError(wrongFormatMsg);
     }
 
     @Test
@@ -210,8 +195,7 @@ public class TestPayDebitCard {
     public void shouldNumberInFieldNameFormDebit() {
         var info = getNumberInFieldName();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldNameError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldNameError(wrongFormatMsg);
     }
 
     @Test
@@ -220,8 +204,7 @@ public class TestPayDebitCard {
     public void shouldEnglishNameInFieldNameFormDebit() {
         var info = DataHelper.getRusName();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldNameError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldNameError(wrongFormatMsg);
     }
 
     @Test
@@ -229,8 +212,7 @@ public class TestPayDebitCard {
     public void shouldOnlySurnameFormDebit() {
         var info = DataHelper.getOnlySurnameInFieldName();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldNameError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldNameError(wrongFormatMsg);
     }
 
     @Test
@@ -238,8 +220,7 @@ public class TestPayDebitCard {
     public void shouldEmptyCVVInFieldCVVFormDebit() {
         var info = getEmptyCVVInFieldCVV();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCVVError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCVVError(wrongFormatMsg);
     }
 
     @Test
@@ -247,8 +228,7 @@ public class TestPayDebitCard {
     public void shouldOneNumberInFieldCVVFormDebit() {
         var info = getOneNumberInFieldCVV();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCVVError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCVVError(wrongFormatMsg);
     }
 
     @Test
@@ -256,7 +236,6 @@ public class TestPayDebitCard {
     public void shouldTwoNumberInFieldCVVАFormDebit() {
         var info = getOTwoNumberInFieldCVV();
         debitPaymentPage.sendingCardData(info);
-        String message = debitPaymentPage.sendingValidDataWithFieldCVVError();
-        assertEquals(wrongFormatMsg, message);
+        debitPaymentPage.sendingValidDataWithFieldCVVError(wrongFormatMsg);
     }
 }
